@@ -29,7 +29,7 @@ iterToChar n = chr (ord '0' + n `mod` 10)
 ---
 
 drawFractal :: Surface -> Integer -> Integer -> Integer -> IO ()
-drawFractal s w h max = forM_ [(i, j) | i <- [0..w], j <- [0..h]] (drawPixel s w h max)
+drawFractal s w h max = forM_ [(i, j) | i <- [0..(w - 1)], j <- [0..(h - 1)]] (drawPixel s w h max)
 
 drawPixel :: Surface -> Integer -> Integer -> Integer -> (Integer, Integer) -> IO ()
 drawPixel s w h max (i, j) = setPixel s i j c
