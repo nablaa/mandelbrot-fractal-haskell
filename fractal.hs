@@ -68,7 +68,7 @@ getIterColor :: Integer -> Integer -> (Word8, Word8, Word8)
 getIterColor iter max | iter == 1 = (255, 255, 255)
                       | iter == 0 = (0, 0, 0)
                       | otherwise = (c, c, c)
-                      where c = fromInteger $ iter `mod` 256
+                      where c = fromInteger $ (iter * 11) `mod` 256
 
 pixelToCoord :: Integer -> Integer -> Integer -> Integer -> (Double, Double)
 pixelToCoord w h i j = (-2.0 + (fromInteger i * dx + dx / 2.0), 1 - (fromInteger j * dy + dy / 2.0))
@@ -85,9 +85,9 @@ getIter' max k x y x0 y0
     | otherwise = getIter' max (k + 1) (x * x - y * y + x0) (2 * x * y + y0) x0 y0
 
 
-width = 300
-height = 200
-maxIter = 255
+width = 600
+height = 400
+maxIter = 10
 
 
 main = do
@@ -100,10 +100,9 @@ main = do
   updateRect screen (Rect 0 0 width height)
   eventHandler
 
-
 {-
 main = do
-  printFractal 100 60 100
+  printFractal width height maxIter
 -}
 
 
