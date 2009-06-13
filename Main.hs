@@ -29,16 +29,15 @@ iterToChar n = chr (ord '0' + n `mod` 10)
 ---
 
 drawFractal :: Surface -> Integer -> Integer -> Area -> Integer -> IO ()
-drawFractal s w h area max = forM_ [(i, j) | j <- [0..(h - 1)], i <- [0..(w - 1)]] (drawPixel s w h area max)
+drawFractal s w h area max = forM_ (getPixelColors w h area max) setPixel'
+    where setPixel' (i, j, c) = setPixel s i j c
 
 drawPixel :: Surface -> Integer -> Integer -> Area -> Integer -> (Integer, Integer) -> IO ()
 drawPixel s w h area max (i, j) = setPixel s i j c
     where c = getPixelColor w h area i j max
 
---Color 255 (fromIntegral (i `mod` 255)) (fromIntegral (j `mod` 255))
---getPixelColor w h i j max
---Color (fromIntegral (i `mod` 256)) (fromIntegral (j `mod` 255)) (fromIntegral (j `mod` 255)) --getPixelColor w h i j max -- Color 255 255 255
-
+getPixelColors :: Integer -> Integer -> Area -> Integer -> [(Integer, Integer, Color)]
+getPixelColors w h area max = [(i, j, getPixelColor w h area i j max) | j <- [0..(h - 1)], i <- [0..(w - 1)]]
 
 toInt :: (Integral a) => a -> Int
 toInt n = fromIntegral n
@@ -65,9 +64,9 @@ getPixelColor w h area i j max = colorWrapper $ getIterColor (getIter max x y) m
 colorWrapper :: (Word8, Word8, Word8) -> Color
 colorWrapper (r, g, b) = Color r g b
 
-width = 300
-height = 200
-maxIter = 10
+width = 600
+height = 400
+maxIter = 100
 startArea = (-2, 1, 1, -1)
 
 main :: IO ()
@@ -119,6 +118,12 @@ keyHandler screen area@(x0, y0, x1, y1) keysym
     | symKey keysym == SDLK_RIGHT = do
   drawScreen screen areaRight
   eventHandler screen areaRight
+    | symKey keysym == SDLK_PLUS = do
+  drawScreen screen areaIn
+  eventHandler screen areaIn
+    | symKey keysym == SDLK_MINUS = do
+  drawScreen screen areaOut
+  eventHandler screen areaOut
     | otherwise = eventHandler screen area
     where dx = abs (x1 - x0) / 10
           dy = abs (y1 - y0) / 10
@@ -126,4 +131,6 @@ keyHandler screen area@(x0, y0, x1, y1) keysym
           areaDown = (x0, y0 - dy, x1, y1 - dy)
           areaLeft = (x0 - dx, y0, x1 - dx, y1)
           areaRight = (x0 + dx, y0, x1 + dx, y1)
+          areaIn = (x0 + dx, y0 - dy, x1 - dx, y1 + dy)
+          areaOut = (x0 - dx, y0 + dy, x1 + dx, y1 - dy)
 
